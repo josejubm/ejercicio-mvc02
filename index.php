@@ -12,14 +12,12 @@
 
 <?php
 
+require_once("config/config.php");
+
 $url=!empty($_GET['url'])? $_GET['url']: 'home/home';
-
-$arrUrl=explode("/", $url);
-
+$arrUrl=explode("/",$url);
 $controller=$arrUrl[0];
-
 $method=$arrUrl[0];
-
 $params="";
 
 if(!empty($arrUrl[1]))
@@ -37,27 +35,47 @@ if(!empty($arrUrl[2]))
     {
         for($i=2; $i<count($arrUrl); $i++ )
         {
-         $params.= $arrUrl.',';   
+         $params.= $arrUrl[$i].',';   
         }
         
     }
 
-    echo $params;
+    //echo $params;
 }
 
-echo "<br>";
 
-echo "controlador: ".$controller;
+spl_autoload_register(function($class){
+    if(file_exists(LIBS.'core/'.$class.".php")){
+        require_once(LIBS.'core/'.$class.".php");
+    };
+});
 
-echo "<br>";
 
-echo "metodo: ".$method;
+$controllerFile="controllers/".$controller.".php";
+if(file_exists($controllerFile)){
 
-echo "<br>";
+    require_once($controllerFile);
 
-echo "parametros: ".$params;
+    $controller=new $controller();
+    if (method_exists($controller, $method)){
+        $controller->{$method}($params);
+    }else{
+        echo "no existe el metodo";
+    }
+    }else{
+        echo "no existe el controlador";
+    }
 
-echo "<br>";
+
+
+
+//echo "<br>";
+//echo "controlador: ".$controller;
+//echo "<br>";
+//echo "metodo: ".$method;
+//echo "<br>";
+//echo "parametros: ".$params;
+//echo "<br>";
 
 ?>
 
